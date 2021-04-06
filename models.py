@@ -83,6 +83,9 @@ class NearEarthObject:
                 f"diameter={self.diameter:.3f}, hazardous={self.hazardous!r})")
 
     def serialize(self):
+        """To serialize an object.
+        :return: serialized object of NearEarth
+        """
         res_dict = {
             "designation": self.designation,
             "name": self.name,
@@ -162,11 +165,13 @@ class CloseApproach:
                 f"velocity={self.velocity:.2f}, neo={self.neo!r})")
 
     def serialize(self):
+        """To serialize an object.
+        :return: serialized object of Close Approach
+        """
         res_dict = {
-            "datetime_utc": self.time,
+            "datetime_utc": datetime_to_str(self.time),
             "distance_au": self.distance,
-            "velocity_km_s": self.velocity,
-            "neo": self.neo.serialize()
+            "velocity_km_s": self.velocity
         }
         return res_dict
 
