@@ -16,6 +16,7 @@ iterator.
 
 You'll edit this file in Tasks 3a and 3c.
 """
+import itertools
 import operator
 
 
@@ -38,6 +39,7 @@ class AttributeFilter:
     Concrete subclasses can override the `get` classmethod to provide custom
     behavior to fetch a desired attribute from the given `CloseApproach`.
     """
+
     def __init__(self, op, value):
         """Construct a new `AttributeFilter` from an binary predicate and a reference value.
 
@@ -72,6 +74,86 @@ class AttributeFilter:
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
 
+class DistanceFilter(AttributeFilter):
+    """
+    A subclass of `AttributeFilter` that compare the distance attribute of a `CloseApproach` object to a reference value.
+    It works like a callable predicate for whether the `CloseApproach` object satisfies the criteria
+
+    It is constructed with a comparator operator and a reference value, and
+    calling the filter (with __call__) executes `get(approach) OP value` (in
+    infix notation).
+    """
+
+    @classmethod
+    def get(cls, approach):
+        """
+        Get access to velocity attribute
+        :param approach: instance of an object type CloseApproach
+        :return: distance attribute of the instance
+        """
+        return approach.distance
+
+
+class VelocityFilter(AttributeFilter):
+    """
+    A subclass of `AttributeFilter` that compare the Speed attribute of a `CloseApproach` object to a reference value.
+    """
+
+    @classmethod
+    def get(cls, approach):
+        """
+        Get access to velocity attribute
+        :param approach: instance of an object type CloseApproach
+        :return: velocity attribute of the instance
+        """
+        return approach.velocity
+
+
+class TimeFilter(AttributeFilter):
+    """
+    A subclass of `AttributeFilter` that compare the Time attribute of a `CloseApproach` object to a reference value.
+    """
+
+    @classmethod
+    def get(cls, approach):
+        """
+        Get access to time attribute
+        :param approach: instance of an object type CloseApproach
+        :return: time attribute of the instance
+        """
+        return approach.time.date()
+
+
+class DiameterFilter(AttributeFilter):
+    """
+    A subclass of `AttributeFilter` that compare the Diameter attribute of a `NearEarthObject` object to a reference value.
+    """
+
+    @classmethod
+    def get(cls, approach):
+        """
+        Get access to velocity attribute
+        :param approach: instance of an object type CloseApproach
+        :return: diameter attribute of the neo instance of the CloseApproache object
+        """
+        return approach.neo.diameter
+
+
+class HazardousFilter(AttributeFilter):
+    """
+    A subclass of `AttributeFilter` that checks if the instance of a `CloseApproach` object is hazardous
+    """
+
+    @classmethod
+    def get(cls, approach):
+        """
+        Get access to velocity attribute
+        :param approach: instance of an object type CloseApproach
+        :return: hazardous attribute of the neo instance of the CloseApproache object
+        """
+        return approach.neo.hazardous
+
+
 def create_filters(date=None, start_date=None, end_date=None,
                    distance_min=None, distance_max=None,
                    velocity_min=None, velocity_max=None,
@@ -104,10 +186,32 @@ def create_filters(date=None, start_date=None, end_date=None,
     :param diameter_min: A minimum diameter of the NEO of a matching `CloseApproach`.
     :param diameter_max: A maximum diameter of the NEO of a matching `CloseApproach`.
     :param hazardous: Whether the NEO of a matching `CloseApproach` is potentially hazardous.
-    :return: A collection of filters for use with `query`.
+    :return: A collection of filters of instances of subclasses of AttributeFilter for use with `query`.
     """
-    # TODO: Decide how you will represent your filters.
-    return ()
+    filters = []
+    for key, value in locals().items():
+        if key.lower() == 'distance_min' and value:
+            filters.append(DistanceFilter(operator.ge, value))
+        if key.lower() == 'distance_max' and value:
+            filters.append(DistanceFilter(operator.le, value))
+        if key.lower() == 'velocity_min' and value:
+            filters.append(VelocityFilter(operator.ge, value))
+        if key.lower() == 'velocity_max' and value:
+            filters.append(VelocityFilter(operator.le, value))
+        if key.lower() == 'diameter_min' and value:
+            filters.append(DiameterFilter(operator.ge, value))
+        if key.lower() == 'diameter_max' and value:
+            filters.append(DiameterFilter(operator.le, value))
+        if key.lower() == 'date' and value:
+            filters.append(TimeFilter(operator.eq, value))
+        if key.lower() == 'start_date' and value:
+            filters.append(TimeFilter(operator.ge, value))
+        if key.lower() == 'end_date' and value:
+            filters.append(TimeFilter(operator.le, value))
+        if key.lower() == 'hazardous' and value is not None:
+            filters.append(HazardousFilter(operator.eq, value))
+
+    return filters
 
 
 def limit(iterator, n=None):
@@ -119,5 +223,8 @@ def limit(iterator, n=None):
     :param n: The maximum number of values to produce.
     :yield: The first (at most) `n` values from the iterator.
     """
-    # TODO: Produce at most `n` values from the given iterator.
-    return iterator
+    if n == 0 or n is None:
+        return iterator
+    else:
+        return itertools.islice(iterator, n)
+
