@@ -71,12 +71,16 @@ class AttributeFilter:
         raise UnsupportedCriterionError
 
     def __repr__(self):
+        """Representation method."""
         return f"{self.__class__.__name__}(op=operator.{self.op.__name__}, value={self.value})"
 
 
 class DistanceFilter(AttributeFilter):
-    """
-    A subclass of `AttributeFilter` that compare the distance attribute of a `CloseApproach` object to a reference value.
+    """A subclass of AttributeFilter.
+
+    that compare the distance attribute of a `CloseApproach` object to a reference
+    value.
+
     It works like a callable predicate for whether the `CloseApproach` object satisfies the criteria
 
     It is constructed with a comparator operator and a reference value, and
@@ -86,7 +90,8 @@ class DistanceFilter(AttributeFilter):
 
     @classmethod
     def get(cls, approach):
-        """
+        """Get method.
+
         Get access to velocity attribute
         :param approach: instance of an object type CloseApproach
         :return: distance attribute of the instance
@@ -95,13 +100,15 @@ class DistanceFilter(AttributeFilter):
 
 
 class VelocityFilter(AttributeFilter):
-    """
+    """Filter.
+
     A subclass of `AttributeFilter` that compare the Speed attribute of a `CloseApproach` object to a reference value.
     """
 
     @classmethod
     def get(cls, approach):
-        """
+        """Get.
+
         Get access to velocity attribute
         :param approach: instance of an object type CloseApproach
         :return: velocity attribute of the instance
@@ -110,13 +117,15 @@ class VelocityFilter(AttributeFilter):
 
 
 class TimeFilter(AttributeFilter):
-    """
+    """TimeFilter.
+
     A subclass of `AttributeFilter` that compare the Time attribute of a `CloseApproach` object to a reference value.
     """
 
     @classmethod
     def get(cls, approach):
-        """
+        """Get.
+
         Get access to time attribute
         :param approach: instance of an object type CloseApproach
         :return: time attribute of the instance
@@ -125,13 +134,16 @@ class TimeFilter(AttributeFilter):
 
 
 class DiameterFilter(AttributeFilter):
-    """
-    A subclass of `AttributeFilter` that compare the Diameter attribute of a `NearEarthObject` object to a reference value.
+    """Diameter Filter.
+
+    A subclass of `AttributeFilter` that compare the Diameter attribute of a `NearEarthObject` object to a reference
+    value.
     """
 
     @classmethod
     def get(cls, approach):
-        """
+        """Get.
+
         Get access to velocity attribute
         :param approach: instance of an object type CloseApproach
         :return: diameter attribute of the neo instance of the CloseApproache object
@@ -140,13 +152,15 @@ class DiameterFilter(AttributeFilter):
 
 
 class HazardousFilter(AttributeFilter):
-    """
+    """Hazardous Filter.
+
     A subclass of `AttributeFilter` that checks if the instance of a `CloseApproach` object is hazardous
     """
 
     @classmethod
     def get(cls, approach):
-        """
+        """Get.
+
         Get access to velocity attribute
         :param approach: instance of an object type CloseApproach
         :return: hazardous attribute of the neo instance of the CloseApproache object
@@ -211,7 +225,7 @@ def create_filters(date=None, start_date=None, end_date=None,
         if key.lower() == 'hazardous' and value is not None:
             filters.append(HazardousFilter(operator.eq, value))
 
-    return filters
+    return tuple(filters)
 
 
 def limit(iterator, n=None):
@@ -227,4 +241,3 @@ def limit(iterator, n=None):
         return iterator
     else:
         return itertools.islice(iterator, n)
-

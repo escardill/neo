@@ -123,4 +123,3 @@ class NEODatabase:
             flag = False in map(lambda f: f(approach), filters)
             if not flag:
                 yield approach
-

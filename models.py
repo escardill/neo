@@ -17,7 +17,6 @@ quirks of the data set, such as missing names and unknown diameters.
 
 You'll edit this file in Task 1.
 """
-import math
 from helpers import cd_to_datetime, datetime_to_str
 
 
@@ -33,6 +32,7 @@ class NearEarthObject:
     initialized to an empty collection, but eventually populated in the
     `NEODatabase` constructor.
     """
+
     # If you make changes, be sure to update the comments in this file.
     def __init__(self, designation, name, diameter, hazardous, **info):
         """Create a new `NearEarthObject`.
@@ -48,13 +48,16 @@ class NearEarthObject:
         # handle any edge cases, such as a empty name being represented by `None`
         # and a missing diameter being represented by `float('nan')`.
         self.designation = designation
-        if name:
+        if name and name != '':
             self.name = name
         else:
             self.name = None
 
         if diameter:
-            self.diameter = float(diameter)
+            try:
+                self.diameter = float(diameter)
+            except ValueError:
+                print("Oops!  That was no valid number.  Try again...")
         else:
             self.diameter = float('nan')
 
@@ -69,13 +72,14 @@ class NearEarthObject:
     @property
     def fullname(self):
         """Return a representation of the full name of this NEO."""
-        return self.designation # + ' ' + self.name
+        return self.designation  # + ' ' + self.name
 
     def __str__(self):
         """Return `str(self)`."""
         # The project instructions include one possibility. Peek at the __repr__
         # method for examples of advanced string formatting.
-        return f"A NearEarthObject with id {self.designation} (named {self.name}, diameter: {self.diameter}, hazardous:{self.hazardous})"
+        return f"A NearEarthObject with id {self.designation} (named {self.name}, diameter: {self.diameter}," \
+               f" hazardous:{self.hazardous}) "
 
     def __repr__(self):
         """Return `repr(self)`, a computer-readable string representation of this object."""
@@ -84,6 +88,7 @@ class NearEarthObject:
 
     def serialize(self):
         """To serialize an object.
+
         :return: serialized object of NearEarth
         """
         res_dict = {
@@ -108,27 +113,37 @@ class CloseApproach:
     private attribute, but the referenced NEO is eventually replaced in the
     `NEODatabase` constructor.
     """
+
     # If you make changes, be sure to update the comments in this file.
     def __init__(self, designation, time, distance, velocity, **info):
         """Create a new `CloseApproach`.
+
         :param time: The date and time, in UTC, at which the NEO passes closest to Earth.
         :param distance: A float representing The nominal approach distance, in astronomical units, of the NEO to Earth at the closest point.
         :param velocity: A float representing The velocity, in kilometers per second, of the NEO relative to Earth at the closest point.
         :param neo: The NearEarthObject that is making a close approach to Earth.
         :param info: A dictionary of excess keyword arguments supplied to the constructor.
         """
-        # TODO: Assign information from the arguments passed to the constructor
         # onto attributes named `_designation`, `time`, `distance`, and `velocity`.
         # You should coerce these values to their appropriate data type and handle any edge cases.
         # The `cd_to_datetime` function will be useful.
         self._designation = designation
         if time:
-            self.time = cd_to_datetime(time)
+            try:
+                self.time = cd_to_datetime(time)
+            except ValueError:
+                print("The date and time should be in UTC")
         else:
             self.time = None
+        try:
+            self.distance = float(distance)
+        except ValueError:
+            print("Distance must be a number")
 
-        self.distance = float(distance)
-        self.velocity = float(velocity)
+        try:
+            self.velocity = float(velocity)
+        except ValueError:
+            print("Velocity must be a number")
 
         # Create an attribute for the referenced NEO, originally None.
         self.neo = None
@@ -146,14 +161,10 @@ class CloseApproach:
         formatted string that can be used in human-readable representations and
         in serialization to CSV and JSON files.
         """
-        # TODO: Use this object's `.time` attribute and the `datetime_to_str` function to
-        # build a formatted representation of the approach time.
-        # TODO: Use self.designation and self.name to build a fullname for this object.
         return datetime_to_str(self.time)
 
     def __str__(self):
         """Return `str(self)`."""
-        # TODO: Use this object's attributes to return a human-readable string representation.
         # The project instructions include one possibility. Peek at the __repr__
         # method for examples of advanced string formatting.
         return f"On {self.time_str}, {self.neo.fullname} approaches Earth " \
@@ -166,6 +177,7 @@ class CloseApproach:
 
     def serialize(self):
         """To serialize an object.
+
         :return: serialized object of Close Approach
         """
         res_dict = {
@@ -177,4 +189,8 @@ class CloseApproach:
 
     @property
     def designation(self):
+        """Designation.
+
+        :return: designation
+        """
         return self._designation
